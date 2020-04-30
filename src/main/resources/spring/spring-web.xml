@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+<!--    开启spring MVC 注解模式-->
+<mvc:annotation-driven></mvc:annotation-driven>
+    <!-- 开启注解扫描 -->
+    <context:component-scan base-package="com.sane.o2o.web">
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+    <!-- 静态资源访问处理 -->
+    <mvc:resources mapping="/resources/**" location="/resources/"></mvc:resources>
+    <mvc:default-servlet-handler/>
+
+    <!-- 视图解析器 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/html/"/>
+        <property name="suffix" value=".html"/>
+    </bean>
+
+    <!--上传文件解析器-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!--		上传文件时文件的临时目录，如果不指定也会基于容器运行目录和项目目录生产一个临时目录-->
+        <property name="uploadTempDir" value="upload_temp"></property>
+        <!--		上传内容的默认编码，如果不配置则取系统默认编码-->
+        <property name="defaultEncoding" value="UTF-8"></property>
+        <!--maxInMemorySize 设置在将上传内容写入磁盘之前允许的最大大小（以字节为单位）默认是10240。
+        超出该设置的大小后上传的文件会被存储到磁盘上uploadTempDir所指定的临时目录中-->
+        <!--		<property name="maxInMemorySize" value="114687"></property>-->
+        <!--设置允许上传的最大容量，默认-1不限制 单位字节，
+        更准确的说该参数是设置multipart类型的请求的单次请求允许提交的最大容量，
+        也包含本次请求中非上传文件的大小。如果整个请求的容量超出了该设置则后抛出
+        org.springframework.web.multipart.MaxUploadSizeExceededException-->
+        <!--		<property name="maxUploadSize" value="20971520"></property>-->
+    </bean>
+</beans>

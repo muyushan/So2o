@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sane.o2o.dao.ShopDao">
+
+    <resultMap id="shopMap" type="com.sane.o2o.entity.Shop">
+        <id property="shopId" column="shop_id"></id>
+        <result property="shopName" column="shop_name"></result>
+        <result property="shopDesc" column="shop_desc"></result>
+        <result property="shopAddr" column="shop_addr"></result>
+        <result property="phone" column="phone"></result>
+        <result property="shopImg" column="shop_img"></result>
+        <result property="priority" column="priority"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="lastEditTime" column="last_edit_time"></result>
+        <result property="enableStatus" column="enable_status"></result>
+        <result property="advice" column="advice"></result>
+        <association property="area" column="area_id" javaType="com.sane.o2o.entity.Area">
+            <id property="areaId" column="area_id"></id>
+            <result property="areaName" column="area_name"></result>
+        </association>
+        <association property="shopCategory" column="shop_category_id" javaType="com.sane.o2o.entity.ShopCategory">
+            <id property="shopCategoryId" column="shop_category_id"></id>
+            <result property="shopCategoryName" column="shop_category_name"></result>
+        </association>
+        <association property="personInfo" column="owner_id" javaType="com.sane.o2o.entity.PersonInfo">
+            <id column="user_id" property="userId"></id>
+            <result property="name" column="name"></result>
+        </association>
+    </resultMap>
+    <sql id="whereCondiction">
+        <if test="shopCondiction!=null and shopCondiction.shopCategory!=null and shopCondiction.shopCategory.shopCategoryId!=null">
+            AND tsc.shop_category_id=#{shopCondiction.shopCategory.shopCategoryId}
+        </if>
+        <if test="shopCondiction!=null and shopCondiction.shopCategory!=null and shopCondiction.shopCategory.parent!=null and shopCondiction.shopCategory.parent.shopCategoryId!=null">
+            AND tsc.parent_id=#{shopCondiction.shopCategory.parent.shopCategoryId}
+        </if>
+        <if test="shopCondiction!=null and shopCondiction.area!=null and shopCondiction.area.areaId!=null">
+            AND tb_shop.area_id=#{shopCondiction.area.areaId}
+        </if>
+        <if test="shopCondiction!=null and shopCondiction.shopName!=null and shopCondiction.shopName!=''">
+            AND tb_shop.shop_name Like '%${shopCondiction.shopName}%'
+        </if>
+        <if test="shopCondiction!=null and shopCondiction.enableStatus!=null">
+            AND tb_shop.enable_status=#{shopCondiction.enableStatus}
+        </if>
+        <if test="shopCondiction!=null and shopCondiction.personInfo!=null and shopCondiction.personInfo.userId!=null">
+            AND tb_shop.owner_id=#{shopCondiction.personInfo.userId}
+        </if>
+    </sql>
+
+    <insert id="insertShop" useGeneratedKeys="true" keyColumn="shop_id" keyProperty="shopId"
+            parameterType="com.sane.o2o.entity.Shop">
+        INSERT INTO tb_shop(
+        `owner_id`,
+        `area_id`,
+        `shop_category_id`,
+        `parent_category_id`,
+        `shop_name`,
+        `shop_desc`,
+        `shop_addr`,
+        `phone`,
+        `shop_img`,
+        `priority`,
+        `create_time`,
+        `enable_status`) VALUES
+        (#{personInfo.userId},
+        #{area.areaId},
+        #{shopCategory.shopCategoryId},
+        #{shopCategory.parent.shopCategoryId},
+        #{shopName},
+        #{shopDesc},
+        #{shopAddr},
+        #{phone},
+        #{shopImg},
+        #{priority},
+        NOW(),
+        #{enableStatus}
+        )
+    </insert>
+    <update id="updateShop" parameterType="com.sane.o2o.entity.Shop">
+        UPDATE tb_shop
+        <set>
+            <if test="shopName!=null and shopName!=''">
+                shop_name=#{shopName},
+            </if>
+            <if test="shopDesc!=null and shopDesc!=''">
+                shop_desc=#{shopDesc},
+            </if>
+            <if test="shopAddr!=null and shopAddr!=''">
+                shop_addr=#{shopAddr},
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone=#{phone},
+            </if>
+            <if test="shopImg!=null and shopImg!=''">
+                shop_img=#{shopImg},
+            </if>
+            <if test="priority!=null">
+                priority=#{priority},
+            </if>
+            <if test="enableStatus!=null">
+                enable_status=#{enableStatus},
+            </if>
+            <if test="lastEditTime!=null">
+                last_edit_time=#{lastEditTime},
+            </if>
+            <if test="advice!=null and advice!=''">
+                advice=#{advice},
+            </if>
+            <if test="shopCategory!=null">
+                shop_category_id=#{shopCategory.shopCategoryId},
+            </if>
+            <if test="area!=null">
+                area_id=#{area.areaId},
+            </if>
+        </set>
+        <where>
+            shop_id=#{shopId}
+        </where>
+    </update>
+    <select id="queryByShopId" parameterType="java.lang.Long" resultMap="shopMap">
+        select
+        tb_shop.shop_id,
+        shop_name,
+        shop_desc,
+        shop_addr,
+        tb_shop.phone,
+        shop_img,
+        tb_shop.priority,
+        tb_shop.create_time,
+        tb_shop.last_edit_time,
+        tb_shop.enable_status,
+        advice,
+        ta.area_id,
+        area_name,
+        tb_shop.shop_category_id,
+        shop_category_name,
+        tpi.user_id,
+        name
+        from tb_shop
+        left join tb_area ta on tb_shop.area_id = ta.area_id
+        left join tb_shop_category tsc on tb_shop.shop_category_id = tsc.shop_category_id
+        left join tb_person_info tpi on tb_shop.owner_id = tpi.user_id
+        <where>
+            tb_shop.shop_id=#{shopId}
+        </where>
+    </select>
+    <select id="queryShopList" resultMap="shopMap">
+        select
+        tb_shop.shop_id,
+        shop_name,
+        shop_desc,
+        shop_addr,
+        tb_shop.phone,
+        shop_img,
+        tb_shop.priority,
+        tb_shop.create_time,
+        tb_shop.last_edit_time,
+        tb_shop.enable_status,
+        advice,
+        ta.area_id,
+        area_name,
+        tb_shop.shop_category_id,
+        shop_category_name,
+        tpi.user_id,
+        name
+        from tb_shop
+        left join tb_area ta on tb_shop.area_id = ta.area_id
+        left join tb_shop_category tsc on tb_shop.shop_category_id = tsc.shop_category_id
+        left join tb_person_info tpi on tb_shop.owner_id = tpi.user_id
+        <where>
+            <include refid="whereCondiction"></include>
+        </where>
+        ORDER BY tb_shop.priority DESC
+        LIMIT #{rowIndex},#{pageSize}
+    </select>
+    <select id="queryShopCount" resultType="java.lang.Integer" parameterType="com.sane.o2o.entity.Shop">
+        select count(tb_shop.shop_id)
+        from tb_shop
+        left join tb_area ta on tb_shop.area_id = ta.area_id
+        left join tb_shop_category tsc on tb_shop.shop_category_id = tsc.shop_category_id
+        left join tb_person_info tpi on tb_shop.owner_id = tpi.user_id
+        <where>
+            <include refid="whereCondiction"></include>
+        </where>
+    </select>
+</mapper>

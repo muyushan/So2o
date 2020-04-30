@@ -1,0 +1,30 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>WebDesign--设计师的充电站</title>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+    <script type="application/javascript">
+        function clickona(){
+
+            var a={};
+            a.name="zhangsan";
+            a.age=5;
+            $.ajax({
+                url: "http://localhost:8080/WebDesign/getResult",
+                type: "POST",
+                dataType: "application/json", //指定服务器返回的数据类型
+                contentType:"application/json",
+                data:JSON.stringify(a),
+                success: function (data) {
+                    console.log(data)
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+欢迎回来 <a href="logout">注销登录</a>
+
+<button onclick="clickona()">点击</button>
+</body>
+</html>

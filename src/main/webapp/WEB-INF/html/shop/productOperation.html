@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html class="pixel-ratio-2 retina">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>品类列表</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css">
+</head>
+<body>
+<div class="page-group">
+    <div id="page-label-input" class="page">
+        <header class="bar bar-nav">
+            <a class="button button-link button-nav pull-left back" href="/demos/form">
+                <span class="icon icon-left"></span>
+                返回
+            </a>
+            <h1 class="title">商品编辑</h1>
+        </header>
+        <div class="content">
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">商品名称</div>
+                                <div class="item-input">
+                                    <input type="text" id="productName" placeholder="商品名称,必填">
+                                    <input type="hidden" id="productId">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">商品类别</div>
+                                <div class="item-input">
+                                    <select id="category" class="">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">优先级</div>
+                                <div class="item-input">
+                                    <input id="priority" type="number" placeholder="优先级值越大越靠前显示" class="">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">原价</div>
+                                <div class="item-input">
+                                    <input id="normalPrice" type="number" placeholder="原价,选填" class="">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">现价</div>
+                                <div class="item-input">
+                                    <input id="promotionPrice" type="number"  placeholder="现价,必填" class="">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">缩略图</div>
+                                <div class="item-input">
+                                    <input type="file" id="smallImg" placeholder="请选择商品缩略图片" accept="image/png,image/jpeg" onchange="showImg(this)" />
+                                </div>
+                            </div>
+                            </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">详情图片</div>
+                                <div class="item-input">
+                                    <input type="file" id="detailImg" placeholder="请选择商品详情图片" multiple="multiple" accept="image/png,image/jpeg" onchange="showImg(this)"/>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">商品描述</div>
+                                <div class="item-input">
+                                    <textarea id="productDesc"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="content-block">
+                <div class="row">
+                    <div class="col-50"><a href="#" class="button button-big button-fill button-danger">取消</a></div>
+                    <div class="col-50"><a href="#" class="button button-big button-fill button-success">提交</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script>
+<script type="text/javascript" src="../resources/js/commonutil.js" charset='utf-8'></script>
+<script type="text/javascript" src="../resources/js/shop/productOperation.js" charset='utf-8'></script>
+
+</body>
+</html>

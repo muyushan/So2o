@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sane.o2o.dao.ProductDao">
+
+    <resultMap id="productMap" type="com.sane.o2o.entity.Product">
+        <id property="productId" column="product_id"></id>
+        <result property="productName" column="product_name"></result>
+        <result property="productDesc" column="product_desc"></result>
+        <result property="imgAddr" column="img_addr"></result>
+        <result property="normalPrice" column="normal_price"></result>
+        <result property="promotionPrice" column="promotion_price"></result>
+        <result property="priority" column="priority"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="lastEditTime" column="last_edit_time"></result>
+        <result property="enableStatus" column="enable_status"></result>
+        <association property="productCategory" column="product_category_id" javaType="com.sane.o2o.entity.ProductCategory">
+            <id column="product_category_id" property="productCategoryId"></id>
+            <result column="product_category_name" property="productCategoryName"></result>
+        </association>
+        <association property="shop" column="shop_id" javaType="Shop">
+            <id column="shop_id" property="shopId"></id>
+            <result property="shopName" column="shop_name"></result>
+        </association>
+    </resultMap>
+    <sql id="whereCondiction">
+        <if test="product!=null and product.productName!=null">
+            and a.product_name like '%${product.productName}%'
+        </if>
+        <if test="product!=null and product.enableStatus!=null">
+            and a.enable_status=#{product.enableStatus}
+        </if>
+        <if test="product!=null and product.productCategory!=null and product.productCategory.productCategoryId!=null">
+            and a.product_category_id=#{product.productCategory.productCategoryId}
+        </if>
+        <if test="product!=null and product.shop!=null and product.shop.shopId!=null">
+            and a.shop_id=#{product.shop.shopId}
+        </if>
+    </sql>
+    <insert id="insertProduct" parameterType="com.sane.o2o.entity.Product" useGeneratedKeys="true" keyProperty="productId" keyColumn="product_id">
+        insert into tb_product(
+        PRODUCT_NAME,
+         PRODUCT_DESC,
+         IMG_ADDR,
+         NORMAL_PRICE,
+         PROMOTION_PRICE,
+         PRIORITY,
+         CREATE_TIME,
+         ENABLE_STATUS,
+         PRODUCT_CATEGORY_ID,
+         SHOP_ID)VALUES (
+         #{productName},
+         #{productDesc},
+         #{imgAddr},
+         #{normalPrice},
+         #{promotionPrice},
+         #{priority},
+         NOW(),
+         #{enableStatus},
+         #{productCategory.productCategoryId},
+         #{shop.shopId}
+         )
+    </insert>
+    <insert id="insertProductImage" parameterType="java.util.List">
+        INSERT  INTO  tb_product_img (img_addr,img_desc,priority,create_time,product_id)
+        VALUES
+        <foreach collection="productImgs" item="productimg" separator="," open="" close="">
+            (
+            #{productimg.imgAddr},
+            #{productimg.imgDesc},
+            #{productimg.priority},
+            NOW(),
+            #{productimg.productId}
+            )
+        </foreach>
+    </insert>
+    <update id="modifyProduct" parameterType="com.sane.o2o.entity.Product">
+        update tb_product set
+        <if test="productName!=null and productName!=''">
+            product_name=#{productName},
+        </if>
+        <if test="productDesc!=null and productDesc!=''">
+            product_desc=#{productDesc},
+        </if>
+        <if test="imgAddr!=null and imgAddr!=''">
+            img_addr=#{imgAddr},
+        </if>
+        <if test="normalPrice!=null and normalPrice!=''">
+            normal_price=#{normalPrice},
+        </if>
+        <if test="promotionPrice!=null and promotionPrice!=''">
+            promotion_price=#{promotionPrice},
+        </if>
+        <if test="priority!=null">
+            priority=#{priority},
+        </if>
+        <if test="productCategory!=null">
+            product_category_id=#{productCategory.productCategoryId},
+        </if>
+        <if test="enableStatus!=null">
+            enable_status=#{enableStatus},
+        </if>
+        last_edit_time=now()
+        where product_id=#{productId}
+    </update>
+    <update id="updateProductCategoryToNull">
+        update tb_product set product_category_id=null  where product_category_id=#{categoryId}
+    </update>
+    <delete id="deleteProductImgByProductId">
+        delete from tb_product_img where product_id=#{productId}
+    </delete>
+    <select id="queryProductImageByProductId" resultType="com.sane.o2o.entity.ProductImg">
+        select product_id,priority,product_img_id,img_addr,img_desc from tb_product_img where product_id=#{productId}
+    </select>
+    <select id="queryProductById" resultMap="productMap" parameterType="java.lang.Long">
+        select
+        a.product_id,
+        a.product_name,
+        a.product_desc,
+        a.img_addr,
+        a.normal_price,
+        a.promotion_price,
+        a.priority,
+        a.create_time,
+        a.last_edit_time,
+        a.enable_status,
+        ts.shop_id,
+        ts.shop_name,
+        tpc.product_category_id,
+        tpc.product_category_name
+         from tb_product a
+         left join tb_shop ts on a.shop_id = ts.shop_id
+         left join tb_product_category tpc on a.product_category_id = tpc.product_category_id
+         where product_id=#{productId}
+    </select>
+    <select id="quereyProductList" resultMap="productMap" parameterType="com.sane.o2o.entity.Product">
+    select
+        a.product_id,
+        a.product_name,
+        a.product_desc,
+        a.img_addr,
+        a.normal_price,
+        a.promotion_price,
+        a.priority,
+        a.create_time,
+        a.last_edit_time,
+        a.enable_status,
+        ts.shop_id,
+        ts.shop_name,
+        tpc.product_category_id,
+        tpc.product_category_name
+         from tb_product a
+         left join tb_shop ts on a.shop_id = ts.shop_id
+         left join tb_product_category tpc on a.product_category_id = tpc.product_category_id
+         <where>
+         <include refid="whereCondiction"></include>
+         </where>
+         order by a.priority
+         limit #{rowIndex},#{pageSize}
+    </select>
+    <select id="quereyProductCount" resultType="java.lang.Integer">
+        select
+        count(a.product_id)
+         from tb_product a
+         left join tb_shop ts on a.shop_id = ts.shop_id
+         left join tb_product_category tpc on a.product_category_id = tpc.product_category_id
+         <where>
+             <include refid="whereCondiction"></include>
+         </where>
+    </select>
+
+</mapper>

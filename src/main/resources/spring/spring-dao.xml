@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--配置数据库相关参数的属性-->
+    <bean id="propertyConfigurer" class="com.sane.o2o.util.EncryptPropertyPlaceHolderConfiger">
+        <property name="ignoreResourceNotFound" value="true"></property>
+        <property name="fileEncoding" value="UTF-8"></property>
+        <property name="locations">
+            <list>
+                <value>classpath:jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+    <context:component-scan base-package="com.sane.o2o">
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <property name="maxActive" value="30"></property>
+        <property name="initialSize" value="10"></property>
+        <property name="queryTimeout" value="10000"></property>
+        <property name="loginTimeout" value="10000"></property>
+        <property name="validationQuery" value="select 1"></property>
+    </bean>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" scope="singleton">
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 配置MyBaties全局配置文件:mybatis-config.xml -->
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+        <!-- 扫描entity包 使用别名 -->
+        <property name="typeAliasesPackage" value="com.sane.o2o.entity" />
+        <property name="mapperLocations">
+            <list>
+                <value>classpath*:mapper/*.xml</value>
+            </list>
+        </property>
+    </bean>
+    <bean name="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--basePackage指定要扫描的包，在此包之下的映射器都会被搜索到。可指定多个包，包与包之间用逗号或分号分隔 -->
+        <property name="basePackage" value="com.sane.o2o.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+</beans>
